@@ -10,11 +10,25 @@ const STATUS_LINE =
 
 const MAX_CHARS = 200;
 
-if (STATUS_LINE.length < 1 || STATUS_LINE.length > MAX_CHARS) {
-  throw new Error(
-    `Status line must be 1-${MAX_CHARS} characters, got ${STATUS_LINE.length}`,
-  );
+function validateLine(line: string): void {
+  const trimmed = line.trim();
+  if (trimmed.length === 0) {
+    throw new Error("Status line must not be blank");
+  }
+  if (line.length < 1 || line.length > MAX_CHARS) {
+    throw new Error(
+      `Status line must be 1-${MAX_CHARS} characters, got ${line.length}`,
+    );
+  }
+  if (line.includes("\n") || line.includes("\r")) {
+    throw new Error("Status line must be a single line (no newlines)");
+  }
+  if (!/\.$/.test(line) || /\.\.$/.test(line)) {
+    throw new Error("Status line must end with exactly one period");
+  }
 }
+
+validateLine(STATUS_LINE);
 
 const outputDir = process.env.MAKEFUN_OUTPUT_DIR ?? "/output";
 mkdirSync(outputDir, { recursive: true });
